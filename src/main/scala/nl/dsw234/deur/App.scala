@@ -3,15 +3,19 @@ package nl.dsw234.deur
 import nl.dsw234.deur.user.{User}
 import nl.dsw234.deur.door._
 import nl.dsw234.deur.gcm.{SmackCcsClient, GCMMessageObservable}
+import org.json.simple.{JSONObject, JSONValue}
 import rx.lang.scala.schedulers.IOScheduler
 
 import collection.JavaConversions._
+
 object App extends App {
 
   def getCcsClient : SmackCcsClient = {
-    val senderId = 0
-    val password = ""
+    val config = JSONValue.parse(scala.io.Source.fromFile("config.json").getLines.mkString).asInstanceOf[JSONObject]
 
+    val gcm = config.get("GCM").asInstanceOf[JSONObject]
+    val senderId = gcm.get("senderId").asInstanceOf[Long]
+    val password = gcm.get("password").asInstanceOf[String]
     val ccsClient = new SmackCcsClient()
 
     ccsClient.connect(senderId, password)
@@ -21,9 +25,11 @@ object App extends App {
   override
   def main(args: Array[String]) {
 
-    val serialHandler = new SerialHandler()
 
     val ccsClient = getCcsClient
+
+    val serialHandler = new SerialHandler()
+
     val androidObservable = GCMMessageObservable.getObservable(ccsClient).observeOn(IOScheduler())
     androidObservable
       .subscribe(_ => serialHandler.sendMessage(OpenDoorMessage()))
