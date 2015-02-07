@@ -7,10 +7,8 @@ Communicates with Android apps via a XMPP connection with the Google Cloud Messa
 ## Config
 Create a config.json file including the following code:
 `{
-	"GCM" : {
 		"senderId" : 0,
 		"password" : ""
-	}
 }`
 
 ## Running

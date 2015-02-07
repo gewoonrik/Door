@@ -3,7 +3,8 @@ package nl.dsw234.deur
 import nl.dsw234.deur.user.{User}
 import nl.dsw234.deur.door._
 import nl.dsw234.deur.gcm.{SmackCcsClient, GCMMessageObservable}
-import org.json.simple.{JSONObject, JSONValue}
+import spray.json._
+
 import rx.lang.scala.schedulers.IOScheduler
 
 import collection.JavaConversions._
@@ -11,20 +12,15 @@ import collection.JavaConversions._
 object App extends App {
 
   def getCcsClient : SmackCcsClient = {
-    val config = JSONValue.parse(scala.io.Source.fromFile("config.json").getLines.mkString).asInstanceOf[JSONObject]
-
-    val gcm = config.get("GCM").asInstanceOf[JSONObject]
-    val senderId = gcm.get("senderId").asInstanceOf[Long]
-    val password = gcm.get("password").asInstanceOf[String]
+    import ConfigJsonProtocol._
+    val config = scala.io.Source.fromFile("config.json").getLines.mkString.parseJson.convertTo[Config]
     val ccsClient = new SmackCcsClient()
-
-    ccsClient.connect(senderId, password)
+    ccsClient.connect(config.senderId, config.password)
     ccsClient
   }
 
   override
   def main(args: Array[String]) {
-
 
     val ccsClient = getCcsClient
 
