@@ -1,11 +1,21 @@
 package nl.dsw234.deur.user
 
+import spray.json._
+
+
 //cardIds is a list of nfc card ids
 //appIds is a list of GCM Ids
+
+
 case class User(name: String, cardIds : Seq[Long], appIds: Seq[String])
 
+object UserJsonProtocol extends DefaultJsonProtocol {
+  implicit val userFormat = jsonFormat3(User.apply)
+}
+
 object User {
-  private val users = List(User("Rik", List(), List()))
+  import UserJsonProtocol._
+  private val users = scala.io.Source.fromFile("users.json").getLines().mkString.parseJson.convertTo[List[User]]
 
   def getUsers: Seq[User] =  {
     users
