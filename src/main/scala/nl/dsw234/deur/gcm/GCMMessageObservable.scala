@@ -29,6 +29,6 @@ object GCMMessageObservable {
         None
       }
     })
-      .filter(_.isDefined).map[GCMMessage](_.get)
+      .filter(_.isDefined).map[FromMessage](_.get)
   }
 }
