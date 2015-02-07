@@ -21,24 +21,22 @@ object App extends App {
 
   override
   def main(args: Array[String]) {
-
     val ccsClient = getCcsClient
-
     val serialHandler = new SerialHandler()
+    val sound = new SoundPlayer("sounds")
 
     val androidObservable = GCMMessageObservable.getObservable(ccsClient).observeOn(IOScheduler())
-    androidObservable
-      .subscribe(_ => serialHandler.sendMessage(OpenDoorMessage()))
-
-
-
     val doorObservable = serialHandler.getMessageObservable.observeOn(IOScheduler())
 
-    doorObservable
+    val openDoorObservable = doorObservable
       .filter(_.isInstanceOf[IdentificationMessage]).map(_.asInstanceOf[IdentificationMessage])
       .filter(message => User.isAuthenticatedCardId(message.cardId))
-      .subscribe(_ => serialHandler.sendMessage(OpenDoorMessage()))
+      .merge(androidObservable)
 
+    openDoorObservable
+      .subscribe(_ => serialHandler.sendMessage(OpenDoorMessage()))
+    openDoorObservable
+      .subscribe(_ => sound.playRandom())
 
     doorObservable
       .filter(_.isInstanceOf[BellIsRinging])
