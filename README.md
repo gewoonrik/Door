@@ -5,10 +5,10 @@ Server application which communicates with an Arduino to open the door and sends
 Communicates with Android apps via a XMPP connection with the Google Cloud Messaging servers 
 
 ## Config
-Create a config.json file including the following code:
+Create a config.json file including the following JSON:
 `{
-		"senderId" : 0,
-		"password" : ""
+		"senderId" : YOUR_GCM_SENDER_ID_AS_INT,
+		"password" : "YOUR_GCM_PASSWORD"
 }`
 
 ## Running
