@@ -40,16 +40,21 @@ object App extends App {
 
     doorObservable
       .filter(_.isInstanceOf[BellIsRinging])
-      .zipWith(User.getUsers)((_, user) => user)
-      .subscribe(user => {
-        user
-          .appIds
-          .foreach(sendMessage(_, ccsClient))
+      .subscribe( _ => {
+        User.getUsers.foreach(user =>{
+          user
+            .appIds
+            .foreach(sendMessage(_, ccsClient))
+        })
       })
+    User.getUsers.foreach(user =>{
+        user.appIds
+        .foreach(sendMessage(_, ccsClient))
+    })
 
 
     while (true){
-      Thread.sleep(10000);
+      Thread.sleep(1000000);
     }
   }
 
@@ -57,7 +62,7 @@ object App extends App {
     val messageId = client.nextMessageId()
     val payload = scala.collection.mutable.Map[String, String]()
     val collapseKey = "sample"
-    val timeToLive = 10000L
+    val timeToLive = 300L
     val message = SmackCcsClient.createJsonMessage(regId, messageId, payload,
       collapseKey, timeToLive, true)
     client.sendDownstreamMessage(message)

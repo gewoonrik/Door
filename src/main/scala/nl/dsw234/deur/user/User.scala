@@ -15,24 +15,24 @@ object UserJsonProtocol extends DefaultJsonProtocol {
 
 object User {
   import UserJsonProtocol._
-  private val users = scala.io.Source.fromFile("users.json").getLines().mkString.parseJson.convertTo[List[User]]
+
 
   def getUsers: Seq[User] =  {
-    users
+    scala.io.Source.fromFile("users.json").getLines().mkString.parseJson.convertTo[List[User]]
   }
 
   def isAuthenticatedCardId(cardId : Long) : Boolean = {
-    users
+    getUsers
       .exists(_.cardIds.contains(cardId))
   }
 
   def isAuthenticatedAppId(appId : String) : Boolean = {
-    users
+    getUsers
       .exists(_.appIds.contains(appId))
   }
 
   def getUserByAppId(appId : String) : Option[User] = {
-    users
+    getUsers
       .find(_.appIds.contains(appId))
   }
 }
