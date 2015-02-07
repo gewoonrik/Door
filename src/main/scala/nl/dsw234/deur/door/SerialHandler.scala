@@ -26,12 +26,12 @@ class SerialHandler {
   }
 
   def getMessageObservable = {
+    val observable = getObservable
     Observable.create[FromDoorMessage]((observer: Observer[FromDoorMessage]) => {
       val buffer = scala.collection.mutable.ArrayBuffer[Byte]()
       var lengthNeeded = 0
-      val observable = getObservable
       observable.subscribe((byte: Byte) => {
-        if (buffer.size == 0) {
+        if (lengthNeeded == 0) {
           lengthNeeded = getMessageSize(byte)
         }
         buffer += byte
@@ -44,35 +44,12 @@ class SerialHandler {
     })
   }
 
-  private def getMessageSize(byte: Byte): Int = byte match  {
-    case 'i' => 5
-    case _ => 0
-  }
+  private def getMessageSize(byte: Byte): Int = FromDoorMessage.getLengthMessage(byte)
 
-  private def getMessage(bytes: Seq[Byte]): FromDoorMessage = bytes(0) match {
-    case 'i' =>
-      val id = unsignedIntToLong(bytes.toArray.drop(1))
-      IdentificationMessage(id)
-    case 'b' =>
-      BellIsRinging()
-  }
+  private def getMessage(bytes: Seq[Byte]): FromDoorMessage = FromDoorMessage.createMessage(bytes)
 
-  def sendMessage(message : ToDoorMessage): Unit = message match  {
-    case OpenDoorMessage() => serialPort.writeByte('o')
-    case _ => //doe niks
-  }
+  def sendMessage(message : ToDoorMessage): Unit = serialPort.writeBytes(message.toBytes())
 
-  def unsignedIntToLong(b : Seq[Byte]) : Long = {
-    var l  = 0L
-    l |= b(0) & 0xFF
-    l <<= 8
-    l |= b(1) & 0xFF
-    l <<= 8
-    l |= b(2) & 0xFF
-    l <<= 8
-    l |= b(3) & 0xFF
-    l
-  }
 
 
 
