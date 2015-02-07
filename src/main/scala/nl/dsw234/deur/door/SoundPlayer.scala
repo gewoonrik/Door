@@ -6,16 +6,21 @@ import javazoom.jl.player.Player
 import scala.util.Random
 
 class SoundPlayer(directory: String) {
-  val files = new File(directory).listFiles().toList.filter(_.isFile)
+  var isPlaying = false;
 
   def playRandom(): Unit =  {
-    val rand = new Random()
-    val randIndex = rand.nextInt(files.length)
-    val randomFile = files(randIndex)
-    new Thread {
-      override def run(): Unit = {
-        new Player(new FileInputStream(randomFile)).play()
-      }
-    }.start()
+    if(!isPlaying) {
+      val files = new File(directory).listFiles().toList.filter(_.isFile)
+      isPlaying = true;
+      val rand = new Random()
+      val randIndex = rand.nextInt(files.length)
+      val randomFile = files(randIndex)
+      new Thread {
+        override def run(): Unit = {
+          new Player(new FileInputStream(randomFile)).play()
+          isPlaying = false
+        }
+      }.start()
+    }
   }
 }
