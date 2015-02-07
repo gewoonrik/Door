@@ -64,7 +64,7 @@ object App extends App {
     val collapseKey = "sample"
     val timeToLive = 300L
     val message = SmackCcsClient.createJsonMessage(regId, messageId, payload,
-      collapseKey, timeToLive, true)
+      collapseKey, timeToLive, false)
     client.sendDownstreamMessage(message)
   }
 }
