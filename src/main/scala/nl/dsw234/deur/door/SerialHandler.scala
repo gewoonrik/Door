@@ -11,7 +11,7 @@ class SerialHandler {
   serialPort.setEventsMask(SerialPort.MASK_RXCHAR)
 
   private def getObservable = {
-    Observable[Byte].apply((subscriber: Subscriber[Byte]) => {
+    Observable[Byte]((subscriber: Subscriber[Byte]) => {
       serialPort.addEventListener(new SerialPortEventListener {
         override def serialEvent(event: SerialPortEvent): Unit = {
           if(event.isRXCHAR) {
